@@ -1,17 +1,34 @@
-namespace WinformsCleanArchitecture
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace WinformsCleanArchitecture;
+
+internal static class Program
 {
-    internal static class Program
+    /// <summary>
+    ///  The main entry point for the application.
+    /// </summary>
+    [STAThread]
+    static void Main()
     {
-        /// <summary>
-        ///  The main entry point for the application.
-        /// </summary>
-        [STAThread]
-        static void Main()
-        {
-            // To customize application configuration such as set high DPI settings or default font,
-            // see https://aka.ms/applicationconfiguration.
-            ApplicationConfiguration.Initialize();
-            Application.Run(new FormMain());
-        }
+        var serviceCollection = new ServiceCollection();
+        ConfigureServices(serviceCollection);
+
+        var serviceProvider = serviceCollection.BuildServiceProvider();
+        var mainForm = serviceProvider.GetRequiredService<FormMain>();
+        
+        Application.Run(mainForm);
+    }
+
+    private static void ConfigureServices(ServiceCollection serviceCollection) 
+    {
+        var configuration = new ConfigurationBuilder()
+            .SetBasePath(AppContext.BaseDirectory)
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            .Build();
+
+        serviceCollection.AddSingleton(configuration);
+        serviceCollection.AddTransient<FormMain>();
+        serviceCollection.AddTransient<FormBrand>();
     }
 }

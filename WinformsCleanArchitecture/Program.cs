@@ -1,3 +1,8 @@
+using Complements.Application;
+using Complements.DB;
+using Complements.Entities;
+using Complements.Repository;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -27,7 +32,11 @@ internal static class Program
             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
             .Build();
 
+        serviceCollection.AddDbContext<AppBrandDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+
         serviceCollection.AddSingleton(configuration);
+        serviceCollection.AddTransient<IRepository<Brand>, BrandRepository>();
+        serviceCollection.AddTransient<AddBrand>();
         serviceCollection.AddTransient<FormMain>();
         serviceCollection.AddTransient<FormBrand>();
     }
